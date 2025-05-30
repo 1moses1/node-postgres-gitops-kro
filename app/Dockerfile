@@ -1,4 +1,4 @@
-FROM node:20-alpine as base
+FROM node:20-alpine AS base
 
 # Create non-root user
 RUN addgroup -S appgroup && adduser -S appuser -G appgroup
@@ -11,5 +11,5 @@ COPY . .
 RUN chown -R appuser:appgroup /usr/src/app
 USER appuser
 
-EXPOSE 80
+EXPOSE 8086
 CMD ["npm", "start"]

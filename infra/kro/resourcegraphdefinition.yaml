@@ -8,7 +8,7 @@ spec:
     kind: FormApp
     spec:
       name: string
-      image: string | default="form-app:latest"
+      image: string | default="moses101/form-app:latest"
       ingress:
         enabled: boolean | default=false
   resources:

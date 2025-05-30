@@ -1,9 +1,11 @@
+require('dotenv').config(); // Load environment variables from .env
+
 const express = require('express');
 const bodyParser = require('body-parser');
 const { Pool } = require('pg');
 const path = require('path');
 const app = express();
-const port = process.env.PORT || 80;
+const port = process.env.PORT || 8086;
 
 const pool = new Pool({
   host: process.env.PGHOST || 'localhost',
@@ -28,4 +30,4 @@ app.post('/submit', async (req, res) => {
   res.redirect('/');
 });
 
-app.listen(port, () => console.log(`App running on port ${port}`));
+app.listen(port, '0.0.0.0', () => console.log(`App running on port ${port}`));

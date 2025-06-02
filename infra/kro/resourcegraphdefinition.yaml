@@ -38,6 +38,17 @@ spec:
                   image: ${schema.spec.image}
                   ports:
                     - containerPort: 8086
+                  env:
+                    - name: PGHOST
+                      value: postgres-svc
+                    - name: PGUSER
+                      value: postgres
+                    - name: PGPASSWORD
+                      value: postgres
+                    - name: PGDATABASE
+                      value: formdb
+                    - name: PGPORT
+                      value: "5432"
 
     - id: appService
       includeWhen:

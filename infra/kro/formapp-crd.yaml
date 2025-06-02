@@ -33,6 +33,8 @@ spec:
                   type: string
                 db:
                   type: boolean
+                type:
+                  type: string
                 ingress:
                   type: object
                   properties:

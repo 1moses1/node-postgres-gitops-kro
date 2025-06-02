@@ -6,6 +6,7 @@ metadata:
 spec:
   name: postgres
   db: true
+  type: db
   image: bitnami/postgresql:12.1.0
   ingress:
     enabled: false

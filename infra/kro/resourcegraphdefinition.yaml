@@ -10,13 +10,14 @@ spec:
       name: string
       image: string | default=""
       db: boolean | default=false
-      type: string | default="app"   # <-- Added type
+      isApp: boolean | default=false
+      isDb: boolean | default=false
       ingress:
         enabled: boolean | default=false
   resources:
     - id: deployment
       includeWhen:
-        - ${schema.spec.type} == "app"
+        - ${schema.spec.isApp}
       template:
         apiVersion: apps/v1
         kind: Deployment
@@ -40,7 +41,7 @@ spec:
 
     - id: appService
       includeWhen:
-        - ${schema.spec.type} == "app"
+        - ${schema.spec.isApp}
       template:
         apiVersion: v1
         kind: Service
@@ -55,7 +56,7 @@ spec:
 
     - id: statefulset
       includeWhen:
-        - ${schema.spec.type} == "db"
+        - ${schema.spec.isDb}
       template:
         apiVersion: apps/v1
         kind: StatefulSet
@@ -87,7 +88,7 @@ spec:
 
     - id: postgresService
       includeWhen:
-        - ${schema.spec.type} == "db"
+        - ${schema.spec.isDb}
       template:
         apiVersion: v1
         kind: Service

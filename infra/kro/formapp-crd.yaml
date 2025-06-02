@@ -33,11 +33,12 @@ spec:
                   type: string
                 db:
                   type: boolean
-                type:
-                  type: string
+                isApp:
+                  type: boolean
+                isDb:
+                  type: boolean
                 ingress:
                   type: object
                   properties:
                     enabled:
                       type: boolean
-

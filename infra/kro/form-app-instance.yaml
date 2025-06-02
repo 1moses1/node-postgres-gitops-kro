@@ -7,6 +7,7 @@ spec:
   name: form-app
   image: moses101/form-app:latest
   db: false
+  type: app
   ingress:
     enabled: false
 

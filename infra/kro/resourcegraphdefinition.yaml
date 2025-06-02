@@ -15,7 +15,7 @@ spec:
   resources:
     - id: deployment
       includeWhen:
-        - ${schema.spec.db} == false
+        - !${schema.spec.db}
       template:
         apiVersion: apps/v1
         kind: Deployment
@@ -39,7 +39,7 @@ spec:
 
     - id: statefulset
       includeWhen:
-        - ${schema.spec.db} == true
+        - ${schema.spec.db}
       template:
         apiVersion: apps/v1
         kind: StatefulSet

@@ -49,6 +49,8 @@ spec:
                       value: formdb
                     - name: PGPORT
                       value: "5432"
+                    - name: PORT
+                      value: "8086"
 
     - id: appService
       includeWhen:

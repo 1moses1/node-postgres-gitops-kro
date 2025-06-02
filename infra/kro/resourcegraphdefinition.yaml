@@ -14,8 +14,8 @@ spec:
         enabled: boolean | default=false
   resources:
     - id: deployment
-      includeWhen:
-        - "!${schema.spec.db}"
+    #   includeWhen:
+    #     - "!${schema.spec.db}"
       template:
         apiVersion: apps/v1
         kind: Deployment

@@ -15,7 +15,7 @@ spec:
   resources:
     - id: deployment
       includeWhen:
-        - !${schema.spec.db}
+        - condition: "{{ not .Values.schema.spec.db }}"
       template:
         apiVersion: apps/v1
         kind: Deployment

@@ -15,7 +15,7 @@ spec:
   resources:
     - id: deployment
       includeWhen:
-        - !${schema.spec.db}
+        - "!${schema.spec.db}"
       template:
         apiVersion: apps/v1
         kind: Deployment
@@ -71,7 +71,7 @@ spec:
 
     - id: appService
       includeWhen:
-        - !${schema.spec.db}
+        - "!${schema.spec.db}"
       template:
         apiVersion: v1
         kind: Service

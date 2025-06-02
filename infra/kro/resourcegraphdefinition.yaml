@@ -10,12 +10,13 @@ spec:
       name: string
       image: string | default=""
       db: boolean | default=false
+      type: string | default="app"   # <-- Added type
       ingress:
         enabled: boolean | default=false
   resources:
     - id: deployment
       includeWhen:
-        - "!${schema.spec.db}"
+        - ${schema.spec.type} == "app"
       template:
         apiVersion: apps/v1
         kind: Deployment
@@ -37,9 +38,24 @@ spec:
                   ports:
                     - containerPort: 8086
 
+    - id: appService
+      includeWhen:
+        - ${schema.spec.type} == "app"
+      template:
+        apiVersion: v1
+        kind: Service
+        metadata:
+          name: ${schema.spec.name}-svc
+        spec:
+          selector:
+            app: ${schema.spec.name}
+          ports:
+            - port: 8086
+              targetPort: 8086
+
     - id: statefulset
       includeWhen:
-        - ${schema.spec.db}
+        - ${schema.spec.type} == "db"
       template:
         apiVersion: apps/v1
         kind: StatefulSet
@@ -69,24 +85,9 @@ spec:
                   ports:
                     - containerPort: 5432
 
-    - id: appService
-      includeWhen:
-        - "!${schema.spec.db}"
-      template:
-        apiVersion: v1
-        kind: Service
-        metadata:
-          name: ${schema.spec.name}-svc
-        spec:
-          selector:
-            app: ${schema.spec.name}
-          ports:
-            - port: 8086
-              targetPort: 8086
-
     - id: postgresService
       includeWhen:
-        - ${schema.spec.db}
+        - ${schema.spec.type} == "db"
       template:
         apiVersion: v1
         kind: Service
@@ -98,7 +99,6 @@ spec:
           ports:
             - port: 5432
               targetPort: 5432
-
 
     - id: ingress
       includeWhen:
@@ -119,4 +119,3 @@ spec:
                         name: ${schema.spec.name}-svc
                         port:
                           number: 8086
-

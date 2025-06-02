@@ -5,9 +5,8 @@ metadata:
   namespace: kro-apps
 spec:
   name: postgres
-  db: true
-  type: db
   image: bitnami/postgresql:12.1.0
+  db: true
+  isDb: true
   ingress:
     enabled: false
-

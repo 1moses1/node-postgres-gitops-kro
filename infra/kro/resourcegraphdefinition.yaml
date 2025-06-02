@@ -39,7 +39,7 @@ spec:
 
     - id: statefulset
       includeWhen:
-        - ${schema.spec.db}
+        - condition: "{{ .Values.schema.spec.db }}"
       template:
         apiVersion: apps/v1
         kind: StatefulSet

@@ -15,7 +15,7 @@ spec:
   resources:
     - id: deployment
       includeWhen:
-        - condition: "{{ not schema.spec.db }}"
+        - "!${schema.spec.db}"
       template:
         apiVersion: apps/v1
         kind: Deployment
@@ -39,7 +39,7 @@ spec:
 
     - id: statefulset
       includeWhen:
-        - condition: "{{ schema.spec.db }}"
+        - ${schema.spec.db}
       template:
         apiVersion: apps/v1
         kind: StatefulSet

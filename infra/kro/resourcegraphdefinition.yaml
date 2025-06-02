@@ -69,7 +69,9 @@ spec:
                   ports:
                     - containerPort: 5432
 
-    - id: service
+    - id: app-service
+      includeWhen:
+        - ${schema.spec.db} == false
       template:
         apiVersion: v1
         kind: Service
@@ -81,6 +83,22 @@ spec:
           ports:
             - port: 8086
               targetPort: 8086
+
+    - id: postgres-service
+      includeWhen:
+        - ${schema.spec.db} == true
+      template:
+        apiVersion: v1
+        kind: Service
+        metadata:
+          name: ${schema.spec.name}-svc
+        spec:
+          selector:
+            app: ${schema.spec.name}
+          ports:
+            - port: 5432
+              targetPort: 5432
+
 
     - id: ingress
       includeWhen:

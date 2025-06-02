@@ -6,7 +6,7 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: https://github.com/youruser/form-submission-app.git
+    repoURL: https://github.com/1moses1/node-postgres-gitops-kro.git
     targetRevision: HEAD
     path: infra
   destination:

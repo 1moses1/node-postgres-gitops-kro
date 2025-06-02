@@ -5,6 +5,6 @@ metadata:
   namespace: kro-apps
 spec:
   name: form-app
-  image: yourdockerhubuser/form-app:latest
+  image: moses101/form-app:latest
   ingress:
     enabled: false

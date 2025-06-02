@@ -1,3 +1,4 @@
+# ✅ [UPDATED] resourcegraphdefinition.yaml
 apiVersion: kro.run/v1alpha1
 kind: ResourceGraphDefinition
 metadata:
@@ -14,7 +15,25 @@ spec:
       isDb: boolean | default=false
       ingress:
         enabled: boolean | default=false
+
   resources:
+    - id: postgres-init-script
+      includeWhen:
+        - ${schema.spec.isDb}
+      template:
+        apiVersion: v1
+        kind: ConfigMap
+        metadata:
+          name: formapp-postgres-init
+        data:
+          init-db.sql: |
+            CREATE TABLE IF NOT EXISTS submissions (
+              id SERIAL PRIMARY KEY,
+              name TEXT NOT NULL,
+              email TEXT NOT NULL,
+              created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            );
+
     - id: deployment
       includeWhen:
         - ${schema.spec.isApp}
@@ -52,6 +71,18 @@ spec:
                       value: "5432"
                     - name: PORT
                       value: "8086"
+                  readinessProbe:
+                    httpGet:
+                      path: /
+                      port: 8086
+                    initialDelaySeconds: 10
+                    periodSeconds: 5
+                  livenessProbe:
+                    httpGet:
+                      path: /
+                      port: 8086
+                    initialDelaySeconds: 15
+                    periodSeconds: 10
 
     - id: appService
       includeWhen:
@@ -99,6 +130,13 @@ spec:
                       value: postgres
                   ports:
                     - containerPort: 5432
+                  volumeMounts:
+                    - name: init-script-volume
+                      mountPath: /docker-entrypoint-initdb.d
+              volumes:
+                - name: init-script-volume
+                  configMap:
+                    name: formapp-postgres-init
 
     - id: postgresService
       includeWhen:

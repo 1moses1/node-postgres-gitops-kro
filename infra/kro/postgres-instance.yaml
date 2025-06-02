@@ -1,0 +1,12 @@
+apiVersion: kro.run/v1alpha1
+kind: FormApp
+metadata:
+  name: postgres-db-instance
+  namespace: kro-apps
+spec:
+  name: postgres
+  db: true
+  image: bitnami/postgresql:12.1.0
+  ingress:
+    enabled: false
+

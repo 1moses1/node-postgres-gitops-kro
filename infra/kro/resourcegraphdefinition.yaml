@@ -1,18 +1,21 @@
 apiVersion: kro.run/v1alpha1
 kind: ResourceGraphDefinition
 metadata:
-  name: form-app-rgd
+  name: form-postgres-rgd
 spec:
   schema:
     apiVersion: v1alpha1
     kind: FormApp
     spec:
       name: string
-      image: string | default="moses101/form-app:latest"
+      image: string | default=""
+      db: boolean | default=false
       ingress:
         enabled: boolean | default=false
   resources:
     - id: deployment
+      includeWhen:
+        - ${schema.spec.db} == false
       template:
         apiVersion: apps/v1
         kind: Deployment
@@ -32,7 +35,40 @@ spec:
                 - name: ${schema.spec.name}
                   image: ${schema.spec.image}
                   ports:
-                    - containerPort: 80
+                    - containerPort: 8086
+
+    - id: statefulset
+      includeWhen:
+        - ${schema.spec.db} == true
+      template:
+        apiVersion: apps/v1
+        kind: StatefulSet
+        metadata:
+          name: ${schema.spec.name}
+        spec:
+          selector:
+            matchLabels:
+              app: ${schema.spec.name}
+          serviceName: ${schema.spec.name}-svc
+          replicas: 1
+          template:
+            metadata:
+              labels:
+                app: ${schema.spec.name}
+            spec:
+              containers:
+                - name: ${schema.spec.name}
+                  image: bitnami/postgresql:12.1.0
+                  env:
+                    - name: POSTGRESQL_DATABASE
+                      value: formdb
+                    - name: POSTGRESQL_USERNAME
+                      value: postgres
+                    - name: POSTGRESQL_PASSWORD
+                      value: postgres
+                  ports:
+                    - containerPort: 5432
+
     - id: service
       template:
         apiVersion: v1
@@ -43,8 +79,9 @@ spec:
           selector:
             app: ${schema.spec.name}
           ports:
-            - port: 80
-              targetPort: 80
+            - port: 8086
+              targetPort: 8086
+
     - id: ingress
       includeWhen:
         - ${schema.spec.ingress.enabled}
@@ -61,6 +98,7 @@ spec:
                     pathType: Prefix
                     backend:
                       service:
-                        name: ${service.metadata.name}
+                        name: ${schema.spec.name}-svc
                         port:
-                          number: 80
+                          number: 8086
+

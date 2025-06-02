@@ -69,7 +69,7 @@ spec:
                   ports:
                     - containerPort: 5432
 
-    - id: app-service
+    - id: appService
       includeWhen:
         - ${schema.spec.db} == false
       template:
@@ -84,7 +84,7 @@ spec:
             - port: 8086
               targetPort: 8086
 
-    - id: postgres-service
+    - id: postgresService
       includeWhen:
         - ${schema.spec.db} == true
       template:

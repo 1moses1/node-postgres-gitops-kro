@@ -36,6 +36,7 @@ spec:
               containers:
                 - name: ${schema.spec.name}
                   image: ${schema.spec.image}
+                  imagePullPolicy: Always
                   ports:
                     - containerPort: 8086
                   env:

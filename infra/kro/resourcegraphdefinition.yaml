@@ -93,6 +93,7 @@ spec:
         metadata:
           name: ${schema.spec.name}-svc
         spec:
+          type: LoadBalancer
           selector:
             app: ${schema.spec.name}
           ports:

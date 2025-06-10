@@ -7,7 +7,7 @@ metadata:
   namespace: metallb-system
 spec:
   addresses:
-    - 192.168.49.200-192.168.49.250  # Make sure this fits my `minikube ip` subnet
+    - 10.0.2.240-10.0.2.250  # My `minikube ip` subnet
 
 ---
 

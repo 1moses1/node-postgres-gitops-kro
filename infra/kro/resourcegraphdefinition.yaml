@@ -15,7 +15,7 @@ spec:
       isDb: boolean | default=false
       ingress:
         enabled: boolean | default=false
-    template:
+    templates:
       statefulset:
         volumeClaimTemplates:
           type: array

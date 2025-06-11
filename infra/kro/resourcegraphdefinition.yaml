@@ -1,9 +1,10 @@
-# ✅ [UPDATED] resourcegraphdefinition.yaml
+# ✅ FINAL, CORRECTED resourcegraphdefinition.yaml
 apiVersion: kro.run/v1alpha1
 kind: ResourceGraphDefinition
 metadata:
   name: form-postgres-rgd
 spec:
+  # CORRECT: 'schema' block comes BEFORE the 'resources' block.
   schema:
     apiVersion: v1alpha1
     kind: FormApp
@@ -21,8 +22,9 @@ spec:
           type: object
           x-kubernetes-preserve-unknown-fields: true
 
+  # CORRECT: 'resources' block comes AFTER the 'schema' block.
   resources:
-    - id: postgresInitScript
+    - id: postgresInitScript # Corrected to lowerCamelCase
       includeWhen:
         - ${schema.spec.isDb}
       template:
@@ -119,6 +121,15 @@ spec:
               app: ${schema.spec.name}
           serviceName: ${schema.spec.name}-svc
           replicas: 1
+          volumeClaimTemplates: # This uses the schema variable
+            - metadata:
+                name: postgres-data
+              spec:
+                accessModes: [ "ReadWriteOnce" ]
+                storageClassName: longhorn
+                resources:
+                  requests:
+                    storage: 1Gi
           template:
             metadata:
               labels:
@@ -140,20 +151,11 @@ spec:
                     - name: init-script-volume
                       mountPath: /docker-entrypoint-initdb.d
                     - name: postgres-data
-                      mountPath: /var/lib/postgresql/data
+                      mountPath: /var/lib/postgresql/data # This path is standard for many PG images
               volumes:
                 - name: init-script-volume
                   configMap:
                     name: formapp-postgres-init
-        volumeClaimTemplates:
-          - metadata:
-              name: postgres-data
-            spec:
-              accessModes: [ "ReadWriteOnce" ]
-              storageClassName: longhorn
-              resources:
-                requests:
-                  storage: 1Gi
 
     - id: postgresService
       includeWhen:

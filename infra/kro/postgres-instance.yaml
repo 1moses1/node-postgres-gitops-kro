@@ -11,3 +11,13 @@ spec:
   isApp: false
   ingress:
     enabled: false
+
+  volumeClaimTemplates:
+    - metadata:
+        name: postgres-data
+      spec:
+        accessModes: [ "ReadWriteOnce" ]
+        storageClassName: longhorn
+        resources:
+          requests:
+            storage: 1Gi

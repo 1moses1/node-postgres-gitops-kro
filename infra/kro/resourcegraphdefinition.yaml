@@ -118,15 +118,7 @@ spec:
               app: ${schema.spec.name}
           serviceName: ${schema.spec.name}-svc
           replicas: 1
-          volumeClaimTemplates:
-            - metadata:
-                name: postgres-data
-              spec:
-                accessModes: [ "ReadWriteOnce" ]
-                storageClassName: longhorn
-                resources:
-                  requests:
-                    storage: 1Gi
+          volumeClaimTemplates: ${schema.spec.volumeClaimTemplates}
           template:
             metadata:
               labels:

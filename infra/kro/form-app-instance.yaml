@@ -8,5 +8,6 @@ spec:
   image: moses101/form-app:latest
   db: false
   isApp: true
+  isDb: false
   ingress:
     enabled: false

@@ -8,5 +8,6 @@ spec:
   image: bitnami/postgresql:12.1.0
   db: true
   isDb: true
+  isApp: false
   ingress:
     enabled: false

@@ -4,7 +4,6 @@ kind: ResourceGraphDefinition
 metadata:
   name: form-postgres-rgd
 spec:
-  # CORRECT: 'schema' block comes BEFORE the 'resources' block.
   schema:
     apiVersion: v1alpha1
     kind: FormApp
@@ -16,15 +15,13 @@ spec:
       isDb: boolean | default=false
       ingress:
         enabled: boolean | default=false
+      # ✅ THE FINAL FIX IS HERE
       volumeClaimTemplates:
         type: array
-        items:
-          type: object
-          x-kubernetes-preserve-unknown-fields: true
+        items: {} # This is the simplest, most compatible way to say "array of any object"
 
-  # CORRECT: 'resources' block comes AFTER the 'schema' block.
   resources:
-    - id: postgresInitScript # Corrected to lowerCamelCase
+    - id: postgresInitScript
       includeWhen:
         - ${schema.spec.isDb}
       template:
@@ -121,7 +118,7 @@ spec:
               app: ${schema.spec.name}
           serviceName: ${schema.spec.name}-svc
           replicas: 1
-          volumeClaimTemplates: # This uses the schema variable
+          volumeClaimTemplates:
             - metadata:
                 name: postgres-data
               spec:
@@ -151,7 +148,7 @@ spec:
                     - name: init-script-volume
                       mountPath: /docker-entrypoint-initdb.d
                     - name: postgres-data
-                      mountPath: /var/lib/postgresql/data # This path is standard for many PG images
+                      mountPath: /var/lib/postgresql/data
               volumes:
                 - name: init-script-volume
                   configMap:

@@ -15,13 +15,13 @@ spec:
       isDb: boolean | default=false
       ingress:
         enabled: boolean | default=false
-    templates:
-      statefulset:
-        volumeClaimTemplates:
-          type: array
-          items:
-            type: object
-            x-kubernetes-preserve-unknown-fields: true
+  templates:
+    statefulset:
+      volumeClaimTemplates:
+        type: array
+        items:
+          type: object
+          x-kubernetes-preserve-unknown-fields: true
 
   resources:
     - id: postgresInitScript

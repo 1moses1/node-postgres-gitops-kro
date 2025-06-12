@@ -17,7 +17,7 @@ spec:
         enabled: boolean | default=false
 
   resources:
-    - id: postgres-init-script
+    - id: postgresInitScript
       includeWhen:
         - ${schema.spec.isDb}
       template:

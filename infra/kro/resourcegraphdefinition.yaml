@@ -1,4 +1,4 @@
-# ✅ FINAL, CORRECTED resourcegraphdefinition.yaml
+# resourcegraphdefinition.yaml
 apiVersion: kro.run/v1alpha1
 kind: ResourceGraphDefinition
 metadata:
@@ -15,13 +15,9 @@ spec:
       isDb: boolean | default=false
       ingress:
         enabled: boolean | default=false
-      # ✅ THE FINAL FIX IS HERE
-      volumeClaimTemplates:
-        type: array
-        items: {} # This is the simplest, most compatible way to say "array of any object"
 
   resources:
-    - id: postgresInitScript
+    - id: postgres-init-script
       includeWhen:
         - ${schema.spec.isDb}
       template:
@@ -97,7 +93,6 @@ spec:
         metadata:
           name: ${schema.spec.name}-svc
         spec:
-          type: LoadBalancer
           selector:
             app: ${schema.spec.name}
           ports:
@@ -118,7 +113,6 @@ spec:
               app: ${schema.spec.name}
           serviceName: ${schema.spec.name}-svc
           replicas: 1
-          volumeClaimTemplates: ${schema.spec.volumeClaimTemplates}
           template:
             metadata:
               labels:
@@ -139,8 +133,6 @@ spec:
                   volumeMounts:
                     - name: init-script-volume
                       mountPath: /docker-entrypoint-initdb.d
-                    - name: postgres-data
-                      mountPath: /var/lib/postgresql/data
               volumes:
                 - name: init-script-volume
                   configMap:

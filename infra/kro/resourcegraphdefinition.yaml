@@ -17,7 +17,7 @@ spec:
         enabled: boolean | default=false
       service:
         type: 
-          type: string | default="ClusterIP"
+          type: string | enum=["ClusterIP", "NodePort", "LoadBalancer"] | default="ClusterIP"
 
   resources:
     - id: postgresInitScript

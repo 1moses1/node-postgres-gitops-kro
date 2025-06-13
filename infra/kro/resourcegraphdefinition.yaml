@@ -16,8 +16,7 @@ spec:
       ingress:
         enabled: boolean | default=false
       service:
-        type: 
-          type: string | enum=["ClusterIP", "NodePort", "LoadBalancer"] | default="ClusterIP"
+          type: string | default="ClusterIP"
 
   resources:
     - id: postgresInitScript

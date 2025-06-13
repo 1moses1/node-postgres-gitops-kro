@@ -47,8 +47,6 @@ spec:
                   properties:
                     type:
                       type: string
-                      enum:
-                        - ClusterIP
-                        - NodePort
-                        - LoadBalancer
+                      enum: ["ClusterIP", "NodePort", "LoadBalancer", "ExternalName"]
+                      default: "ClusterIP"
 

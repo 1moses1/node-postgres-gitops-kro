@@ -11,3 +11,5 @@ spec:
   isDb: false
   ingress:
     enabled: false
+  service:
+    type: LoadBalancer

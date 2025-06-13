@@ -15,6 +15,9 @@ spec:
       isDb: boolean | default=false
       ingress:
         enabled: boolean | default=false
+      service:
+        type: 
+          type: string | default="ClusterIP"
 
   resources:
     - id: postgresInitScript
@@ -93,6 +96,7 @@ spec:
         metadata:
           name: ${schema.spec.name}-svc
         spec:
+          type: ${schema.spec.service.type}
           selector:
             app: ${schema.spec.name}
           ports:

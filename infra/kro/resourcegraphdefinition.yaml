@@ -71,18 +71,18 @@ spec:
                       value: "5432"
                     - name: PORT
                       value: "8086"
-                  readinessProbe:
-                    httpGet:
-                      path: /
-                      port: 8086
-                    initialDelaySeconds: 10
-                    periodSeconds: 5
-                  livenessProbe:
-                    httpGet:
-                      path: /
-                      port: 8086
-                    initialDelaySeconds: 15
-                    periodSeconds: 10
+                  # readinessProbe:
+                  #   httpGet:
+                  #     path: /
+                  #     port: 8086
+                  #   initialDelaySeconds: 10
+                  #   periodSeconds: 5
+                  # livenessProbe:
+                  #   httpGet:
+                  #     path: /
+                  #     port: 8086
+                  #   initialDelaySeconds: 15
+                  #   periodSeconds: 10
 
     - id: appService
       includeWhen:

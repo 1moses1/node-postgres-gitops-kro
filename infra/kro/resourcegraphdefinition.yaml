@@ -17,6 +17,11 @@ spec:
         enabled: boolean | default=false
       service:
           type: string | default="ClusterIP"
+      storage:
+        enabled: boolean | default=false
+        storageClass: string | default="longhorn"
+        size: string | default="1Gi"
+        accessMode: string | default="ReadWriteOnce"
 
   resources:
     - id: postgresInitScript
@@ -35,6 +40,23 @@ spec:
               email TEXT NOT NULL,
               created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             );
+
+    - id: persistentVolumeClaim
+      includeWhen:
+        - ${schema.spec.storage.enabled}
+        - ${schema.spec.isDb}
+      template:
+        apiVersion: v1
+        kind: PersistentVolumeClaim
+        metadata:
+          name: ${schema.spec.name}-pvc
+        spec:
+          accessModes:
+            - ${schema.spec.storage.accessMode}
+          storageClassName: ${schema.spec.storage.storageClass}
+          resources:
+            requests:
+              storage: ${schema.spec.storage.size}
 
     - id: deployment
       includeWhen:
@@ -136,10 +158,15 @@ spec:
                   volumeMounts:
                     - name: init-script-volume
                       mountPath: /docker-entrypoint-initdb.d
+                    - name: postgres-data
+                      mountPath: /bitnami/postgresql
               volumes:
                 - name: init-script-volume
                   configMap:
                     name: formapp-postgres-init
+                - name: postgres-data
+                  persistentVolumeClaim:
+                    claimName: ${schema.spec.name}-pvc
 
     - id: postgresService
       includeWhen:

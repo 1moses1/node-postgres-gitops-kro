@@ -11,3 +11,8 @@ spec:
   isApp: false
   ingress:
     enabled: false
+  storage:
+    enabled: true
+    storageClass: longhorn
+    size: 5Gi
+    accessMode: ReadWriteOnce

@@ -50,4 +50,19 @@ spec:
                       type: string
                       enum: ["ClusterIP", "NodePort", "LoadBalancer", "ExternalName"]
                       default: "ClusterIP"
-
+                storage:
+                  type: object
+                  properties:
+                    enabled:
+                      type: boolean
+                      default: false
+                    storageClass:
+                      type: string
+                      default: "longhorn"
+                    size:
+                      type: string
+                      default: "1Gi"
+                    accessMode:
+                      type: string
+                      enum: ["ReadWriteOnce", "ReadOnlyMany", "ReadWriteMany"]
+                      default: "ReadWriteOnce"

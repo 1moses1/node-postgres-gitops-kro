@@ -17,6 +17,4 @@ spec:
     size: 5Gi
     accessMode: ReadWriteOnce
   securityContext:
-    runAsUser: 1001
-    runAsGroup: 1001
     fsGroup: 1001

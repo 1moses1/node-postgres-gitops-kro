@@ -66,3 +66,15 @@ spec:
                       type: string
                       enum: ["ReadWriteOnce", "ReadOnlyMany", "ReadWriteMany"]
                       default: "ReadWriteOnce"
+                securityContext:
+                  type: object
+                  properties:
+                    runAsUser:
+                      type: integer
+                      default: 1001
+                    runAsGroup:
+                      type: integer
+                      default: 1001
+                    fsGroup:
+                      type: integer
+                      default: 1001                

@@ -22,6 +22,10 @@ spec:
         storageClass: string | default="longhorn"
         size: string | default="1Gi"
         accessMode: string | default="ReadWriteOnce"
+      securityContext:
+        runAsUser: integer | default=1001
+        runAsGroup: integer | default=1001
+        fsGroup: integer | default=1001
 
   resources:
     - id: postgresInitScript
@@ -76,6 +80,10 @@ spec:
               labels:
                 app: ${schema.spec.name}
             spec:
+              securityContext:
+                runAsUser: ${schema.spec.securityContext.runAsUser}
+                runAsGroup: ${schema.spec.securityContext.runAsGroup}
+                fsGroup: ${schema.spec.securityContext.fsGroup}
               containers:
                 - name: ${schema.spec.name}
                   image: ${schema.spec.image}
@@ -143,6 +151,10 @@ spec:
               labels:
                 app: ${schema.spec.name}
             spec:
+              securityContext:
+                runAsUser: ${schema.spec.securityContext.runAsUser}
+                runAsGroup: ${schema.spec.securityContext.runAsGroup}
+                fsGroup: ${schema.spec.securityContext.fsGroup}
               containers:
                 - name: ${schema.spec.name}
                   image: bitnami/postgresql:12.1.0

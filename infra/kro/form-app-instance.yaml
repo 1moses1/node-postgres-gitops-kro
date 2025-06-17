@@ -13,5 +13,5 @@ spec:
     enabled: false
   service:
     type: LoadBalancer
-  securityContext:
-    fsGroup: 1001
+  # securityContext:
+  #   fsGroup: 1001

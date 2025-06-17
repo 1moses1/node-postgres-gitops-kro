@@ -66,32 +66,32 @@ spec:
                       type: string
                       enum: ["ReadWriteOnce", "ReadOnlyMany", "ReadWriteMany"]
                       default: "ReadWriteOnce"
-                securityContext:
-                  type: object
-                  properties:
-                    fsGroup:
-                      type: integer
-                      default: 1001
-                    runAsUser:
-                      type: integer
-                      default: 1001
-                    runAsGroup:
-                      type: integer
-                      default: 1001                
-                initContainer:
-                  type: object
-                  properties:
-                    enabled:
-                      type: boolean
-                      default: false
-                    image:
-                      type: string
-                      default: "busybox"
-                    command:
-                      type: array
-                      items:
-                        type: string
-                      default: ["chown", "-R", "1001:1001", "/bitnami/postgresql/data"]
-                    mountPath:
-                      type: string
-                      default: "/bitnami/postgresql/data"
+                # securityContext:
+                #   type: object
+                #   properties:
+                #     fsGroup:
+                #       type: integer
+                #       default: 1001
+                #     runAsUser:
+                #       type: integer
+                #       default: 1001
+                #     runAsGroup:
+                #       type: integer
+                #       default: 1001                
+                # initContainer:
+                #   type: object
+                #   properties:
+                #     enabled:
+                #       type: boolean
+                #       default: false
+                #     image:
+                #       type: string
+                #       default: "busybox"
+                #     command:
+                #       type: array
+                #       items:
+                #         type: string
+                #       default: ["chown", "-R", "1001:1001", "/bitnami/postgresql/data"]
+                #     mountPath:
+                #       type: string
+                #       default: "/bitnami/postgresql/data"

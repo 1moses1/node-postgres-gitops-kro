@@ -5,7 +5,7 @@ metadata:
   namespace: kro-apps
 spec:
   name: postgres
-  image: bitnami/postgresql:12.1.0
+  image: postgres:15-alpine
   db: true
   isDb: true
   isApp: false
@@ -16,16 +16,16 @@ spec:
     storageClass: longhorn
     size: 5Gi
     accessMode: ReadWriteOnce
-  securityContext:
-    fsGroup: 1001
-    runAsUser: 1001
-    runAsGroup: 1001
-  initContainer:
-    enabled: true
-    image: busybox
-    command: 
-      - chown
-      - "-R"
-      - "1001:1001"
-      - "/bitnami/postgresql/data"
-    mountPath: "/bitnami/postgresql/data"
+  # securityContext:
+  #   fsGroup: 1001
+  #   runAsUser: 1001
+  #   runAsGroup: 1001
+  # initContainer:
+  #   enabled: true
+  #   image: busybox
+  #   command: 
+  #     - chown
+  #     - "-R"
+  #     - "1001:1001"
+  #     - "/bitnami/postgresql/data"
+  #   mountPath: "/bitnami/postgresql/data"

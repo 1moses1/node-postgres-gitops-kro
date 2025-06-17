@@ -91,7 +91,7 @@ kubectl get svc -n kro-apps
 kubectl get applications -n argocd
 ```
 
-### 📌 Trigger Sync Manually (if needed)
+### Trigger Sync Manually (if needed)
 
 ```bash
 argocd app sync form-app -n argocd

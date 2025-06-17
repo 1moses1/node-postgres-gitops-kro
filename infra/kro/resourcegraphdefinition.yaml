@@ -24,8 +24,14 @@ spec:
         accessMode: string | default="ReadWriteOnce"
       securityContext:
         fsGroup: integer | default=1001
-        runAsUser: integer | default=1001  # Added
-        runAsGroup: integer | default=1001  # Added
+        runAsUser: integer | default=1001 
+        runAsGroup: integer | default=1001 
+      initContainer:
+        enabled: boolean | default=false
+        image: string | default="busybox"
+        command: array | default=["chown", "-R", "1001:1001", "/bitnami/postgresql/data"]
+        mountPath: string | default="/bitnami/postgresql/data"
+
 
   resources:
     - id: postgresInitScript
@@ -80,10 +86,10 @@ spec:
               labels:
                 app: ${schema.spec.name}
             spec:
-              securityContext:
-                fsGroup: ${schema.spec.securityContext.fsGroup}
-                runAsUser: ${schema.spec.securityContext.runAsUser}  # Added
-                runAsGroup: ${schema.spec.securityContext.runAsGroup}  # Added      
+              # securityContext:
+              #   fsGroup: ${schema.spec.securityContext.fsGroup}
+              #   runAsUser: ${schema.spec.securityContext.runAsUser}  # Added
+              #   runAsGroup: ${schema.spec.securityContext.runAsGroup}  # Added      
               containers:
                 - name: ${schema.spec.name}
                   image: ${schema.spec.image}
@@ -151,10 +157,18 @@ spec:
               labels:
                 app: ${schema.spec.name}
             spec:
-              securityContext:
-                fsGroup: ${schema.spec.securityContext.fsGroup}
-                runAsUser: ${schema.spec.securityContext.runAsUser}  # Added
-                runAsGroup: ${schema.spec.securityContext.runAsGroup}  # Added
+              # Remove explicit securityContext to let Bitnami image handle it
+              # securityContext:
+              #   fsGroup: ${schema.spec.securityContext.fsGroup}
+              #   runAsUser: ${schema.spec.securityContext.runAsUser}  # Added
+              #   runAsGroup: ${schema.spec.securityContext.runAsGroup}  # Added
+              initContainers:
+                - name: init-permissions
+                  image: ${schema.spec.initContainer.image}
+                  command: ${schema.spec.initContainer.command}
+                  volumeMounts:
+                    - name: postgres-data
+                      mountPath: ${schema.spec.initContainer.mountPath}
               containers:
                 - name: ${schema.spec.name}
                   image: bitnami/postgresql:12.1.0
@@ -165,15 +179,16 @@ spec:
                       value: postgres
                     - name: POSTGRESQL_PASSWORD
                       value: postgres
-                    - name: PGDATABASE
-                      value: /bitnami/postgresql/data
+                    # - name: PGDATABASE
+                    #   value: /bitnami/postgresql/data
                   ports:
                     - containerPort: 5432
                   volumeMounts:
                     - name: init-script-volume
                       mountPath: /docker-entrypoint-initdb.d
                     - name: postgres-data
-                      mountPath: /bitnami/postgresql
+                      mountPath: /bitnami/postgresql/data
+                      # Mount specifically to the data directory, not the parent
               volumes:
                 - name: init-script-volume
                   configMap:

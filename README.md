@@ -72,20 +72,20 @@ User <--> MetalLB LoadBalancer IP
 
 ## ⚙️ Key Commands for Demo
 
-### 📌 Show Minikube Node
+### Show Minikube Node
 
 ```bash
 kubectl get nodes -o wide
 ```
 
-### 📌 Show All Running Applications
+### Show All Running Applications
 
 ```bash
 kubectl get pods -n kro-apps
 kubectl get svc -n kro-apps
 ```
 
-### 📌 Confirm Argo CD Sync Status
+### Confirm Argo CD Sync Status
 
 ```bash
 kubectl get applications -n argocd
@@ -97,7 +97,7 @@ kubectl get applications -n argocd
 argocd app sync form-app -n argocd
 ```
 
-### 📌 Access the Frontend App
+### Access the Frontend App
 
 ```bash
 curl http://<metal-lb-ip>:8086
@@ -109,7 +109,7 @@ Example:
 curl http://10.0.2.240:8086
 ```
 
-### 📌 Insert and View PostgreSQL Data
+### Insert and View PostgreSQL Data
 
 ```bash
 kubectl exec -it postgres-0 -n kro-apps -- \
@@ -122,7 +122,7 @@ kubectl exec -it postgres-0 -n kro-apps -- \
 
 ---
 
-## 💡 Learning Outcome
+## Learning Outcome
 
 This project demonstrates the integration of:
 
@@ -134,11 +134,11 @@ This project demonstrates the integration of:
 
 ---
 
-## 🧪 Future Improvements
+## Future Improvements
 
 - Enable Ingress with TLS (Cert-Manager).
 - CI pipeline to auto-push custom Docker images.
-- Use the secrets manager
+- Use the Secrets Manager tools
 
 ---
 

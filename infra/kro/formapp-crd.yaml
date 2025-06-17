@@ -71,4 +71,10 @@ spec:
                   properties:
                     fsGroup:
                       type: integer
+                      default: 1001
+                    runAsUser:
+                      type: integer
+                      default: 1001
+                    runAsGroup:
+                      type: integer
                       default: 1001                

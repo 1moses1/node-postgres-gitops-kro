@@ -24,6 +24,8 @@ spec:
         accessMode: string | default="ReadWriteOnce"
       securityContext:
         fsGroup: integer | default=1001
+        runAsUser: integer | default=1001  # Added
+        runAsGroup: integer | default=1001  # Added
 
   resources:
     - id: postgresInitScript
@@ -80,6 +82,8 @@ spec:
             spec:
               securityContext:
                 fsGroup: ${schema.spec.securityContext.fsGroup}
+                runAsUser: ${schema.spec.securityContext.runAsUser}  # Added
+                runAsGroup: ${schema.spec.securityContext.runAsGroup}  # Added      
               containers:
                 - name: ${schema.spec.name}
                   image: ${schema.spec.image}
@@ -149,6 +153,8 @@ spec:
             spec:
               securityContext:
                 fsGroup: ${schema.spec.securityContext.fsGroup}
+                runAsUser: ${schema.spec.securityContext.runAsUser}  # Added
+                runAsGroup: ${schema.spec.securityContext.runAsGroup}  # Added
               containers:
                 - name: ${schema.spec.name}
                   image: bitnami/postgresql:12.1.0
@@ -159,6 +165,8 @@ spec:
                       value: postgres
                     - name: POSTGRESQL_PASSWORD
                       value: postgres
+                    - name: PGDATABASE
+                      value: /bitnami/postgresql/data
                   ports:
                     - containerPort: 5432
                   volumeMounts:

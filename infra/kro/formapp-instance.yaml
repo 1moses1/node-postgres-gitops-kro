@@ -6,26 +6,33 @@ metadata:
   namespace: kro-apps
 spec:
   name: formapp-stack
+  # The application configuration
   app:
     enabled: true
     name: form-app
     image: moses101/form-app:latest
-    replicas: 2
-    port: 8086
+    replicas: 4
     service:
       type: LoadBalancer
+      port: 8086
+      targetPort: 8086
+  # The database configuration
   database:
     enabled: true
     name: postgres
     image: bitnami/postgresql:12.1.0
+    replicas: 3
     dbName: formdb
     username: postgres
     password: postgres
-    port: 5432
+    service:
+      port: 5432
+      targetPort: 5432
+    # Persistent storage configuration
     storage:
       enabled: true
       storageClass: longhorn
-      size: 5Gi
+      size: 3Gi
       accessMode: ReadWriteOnce
   ingress:
     enabled: false

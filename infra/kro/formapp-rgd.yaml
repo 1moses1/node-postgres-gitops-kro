@@ -1,4 +1,4 @@
-# resourcegraphdefinition.yaml
+# formapp-rgd.yaml
 apiVersion: kro.run/v1alpha1
 kind: ResourceGraphDefinition
 metadata:
@@ -9,30 +9,38 @@ spec:
     kind: FormApp
     spec:
       name: string
+      # The application configuration
+      # This section defines the application deployment and service
       app:
         enabled: boolean | default=true
         name: string
         image: string
         replicas: integer | default=2
-        port: integer | default=8086
         service:
           type: string | default="LoadBalancer"
+          port: integer | default=8086
+          targetPort: integer | default=8086
+      # The database configuration
+      # This section defines the database deployment, service, and storage
       database:
         enabled: boolean | default=true
         name: string
         image: string | default="bitnami/postgresql:12.1.0"
+        replicas: integer | default=2
         dbName: string | default="formdb"
         username: string | default="postgres"
         password: string | default="postgres"
-        port: integer | default=5432
+        service:
+          port: integer | default=5432
+          targetPort: integer | default=5432
         storage:
           enabled: boolean | default=true
           storageClass: string | default="longhorn"
-          size: string | default="5Gi"
+          size: string | default="3Gi"
           accessMode: string | default="ReadWriteOnce"
       ingress:
         enabled: boolean | default=false
-
+              
   resources:
     # Database Resources
     - id: postgresInitScript
@@ -82,7 +90,7 @@ spec:
             matchLabels:
               app: ${schema.spec.database.name}
           serviceName: ${schema.spec.database.name}-svc
-          replicas: 1
+          replicas: ${schema.spec.database.replicas}
           template:
             metadata:
               labels:
@@ -99,7 +107,8 @@ spec:
                     - name: POSTGRESQL_PASSWORD
                       value: ${schema.spec.database.password}
                   ports:
-                    - containerPort: ${schema.spec.database.port}
+                    - containerPort: ${schema.spec.database.service.targetPort}
+                      name: postgres
                   volumeMounts:
                     - name: init-script-volume
                       mountPath: /docker-entrypoint-initdb.d
@@ -125,8 +134,8 @@ spec:
           selector:
             app: ${schema.spec.database.name}
           ports:
-            - port: ${schema.spec.database.port}
-              targetPort: ${schema.spec.database.port}
+            - port: ${schema.spec.database.service.port}
+              targetPort: ${schema.spec.database.service.targetPort}
 
     # Application Resources
     - id: appDeployment
@@ -152,7 +161,8 @@ spec:
                   image: ${schema.spec.app.image}
                   imagePullPolicy: Always
                   ports:
-                    - containerPort: ${schema.spec.app.port}
+                    - containerPort: ${schema.spec.app.service.targetPort}
+                      name: app-port
                   env:
                     - name: PGHOST
                       value: ${schema.spec.database.name}-svc
@@ -180,8 +190,8 @@ spec:
           selector:
             app: ${schema.spec.app.name}
           ports:
-            - port: ${schema.spec.app.port}
-              targetPort: ${schema.spec.app.port}
+            - port: ${schema.spec.app.service.port}
+              targetPort: ${schema.spec.app.service.targetPort}
 
     # Ingress Resource
     - id: ingress
@@ -202,6 +212,6 @@ spec:
                       service:
                         name: ${schema.spec.app.name}-svc
                         port:
-                          number: ${schema.spec.app.port}
+                          number: ${schema.spec.app.service.port}
 
 

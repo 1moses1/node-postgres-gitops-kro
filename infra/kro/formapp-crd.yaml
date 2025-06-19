@@ -43,9 +43,6 @@ spec:
                     replicas:
                       type: integer
                       default: 2
-                    port:
-                      type: integer
-                      default: 8086
                     service:
                       type: object
                       properties:
@@ -53,6 +50,12 @@ spec:
                           type: string
                           enum: ["ClusterIP", "NodePort", "LoadBalancer", "ExternalName"]
                           default: "LoadBalancer"
+                        port:
+                          type: integer
+                          default: 8086
+                        targetPort:
+                          type: integer
+                          default: 8086
                 database:
                   type: object
                   properties:
@@ -73,9 +76,18 @@ spec:
                     password:
                       type: string
                       default: "postgres"
-                    port:
+                    replicas:
                       type: integer
-                      default: 5432
+                      default: 2
+                    service:
+                      type: object
+                      properties:
+                        port:
+                          type: integer
+                          default: 5432
+                        targetPort:
+                          type: integer
+                          default: 5432
                     storage:
                       type: object
                       properties:
@@ -98,4 +110,5 @@ spec:
                     enabled:
                       type: boolean
                       default: false
+
 

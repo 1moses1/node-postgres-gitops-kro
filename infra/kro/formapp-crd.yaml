@@ -30,39 +30,72 @@ spec:
               properties:
                 name:
                   type: string
-                image:
-                  type: string
-                db:
-                  type: boolean
-                isApp:
-                  type: boolean
-                isDb:
-                  type: boolean
+                app:
+                  type: object
+                  properties:
+                    enabled:
+                      type: boolean
+                      default: true
+                    name:
+                      type: string
+                    image:
+                      type: string
+                    replicas:
+                      type: integer
+                      default: 2
+                    port:
+                      type: integer
+                      default: 8086
+                    service:
+                      type: object
+                      properties:
+                        type:
+                          type: string
+                          enum: ["ClusterIP", "NodePort", "LoadBalancer", "ExternalName"]
+                          default: "LoadBalancer"
+                database:
+                  type: object
+                  properties:
+                    enabled:
+                      type: boolean
+                      default: true
+                    name:
+                      type: string
+                    image:
+                      type: string
+                      default: "bitnami/postgresql:12.1.0"
+                    dbName:
+                      type: string
+                      default: "formdb"
+                    username:
+                      type: string
+                      default: "postgres"
+                    password:
+                      type: string
+                      default: "postgres"
+                    port:
+                      type: integer
+                      default: 5432
+                    storage:
+                      type: object
+                      properties:
+                        enabled:
+                          type: boolean
+                          default: true
+                        storageClass:
+                          type: string
+                          default: "longhorn"
+                        size:
+                          type: string
+                          default: "5Gi"
+                        accessMode:
+                          type: string
+                          enum: ["ReadWriteOnce", "ReadOnlyMany", "ReadWriteMany"]
+                          default: "ReadWriteOnce"
                 ingress:
                   type: object
                   properties:
                     enabled:
                       type: boolean
-                service:
-                  type: object
-                  properties:
-                    type:
-                      type: string
-                      enum: ["ClusterIP", "NodePort", "LoadBalancer", "ExternalName"]
-                      default: "ClusterIP"
-                storage:
-                  type: object
-                  properties:
-                    enabled:
-                      type: boolean
                       default: false
-                    storageClass:
-                      type: string
-                      default: "longhorn"
-                    size:
-                      type: string
-                      default: "1Gi"
-                    accessMode:
-                      type: string
-                      enum: ["ReadWriteOnce", "ReadOnlyMany", "ReadWriteMany"]
-                      default: "ReadWriteOnce"
+

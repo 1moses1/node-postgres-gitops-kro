@@ -1,0 +1,33 @@
+# formapp-instance.yaml
+apiVersion: kro.run/v1alpha1
+kind: FormApp
+metadata:
+  name: formapp-complete-instance
+  namespace: kro-apps
+spec:
+  name: formapp-stack
+  app:
+    enabled: true
+    name: form-app
+    image: moses101/form-app:latest
+    replicas: 2
+    port: 8086
+    service:
+      type: LoadBalancer
+  database:
+    enabled: true
+    name: postgres
+    image: bitnami/postgresql:12.1.0
+    dbName: formdb
+    username: postgres
+    password: postgres
+    port: 5432
+    storage:
+      enabled: true
+      storageClass: longhorn
+      size: 5Gi
+      accessMode: ReadWriteOnce
+  ingress:
+    enabled: false
+
+

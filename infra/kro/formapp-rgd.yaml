@@ -1,0 +1,207 @@
+# resourcegraphdefinition.yaml
+apiVersion: kro.run/v1alpha1
+kind: ResourceGraphDefinition
+metadata:
+  name: form-postgres-rgd
+spec:
+  schema:
+    apiVersion: v1alpha1
+    kind: FormApp
+    spec:
+      name: string
+      app:
+        enabled: boolean | default=true
+        name: string
+        image: string
+        replicas: integer | default=2
+        port: integer | default=8086
+        service:
+          type: string | default="LoadBalancer"
+      database:
+        enabled: boolean | default=true
+        name: string
+        image: string | default="bitnami/postgresql:12.1.0"
+        dbName: string | default="formdb"
+        username: string | default="postgres"
+        password: string | default="postgres"
+        port: integer | default=5432
+        storage:
+          enabled: boolean | default=true
+          storageClass: string | default="longhorn"
+          size: string | default="5Gi"
+          accessMode: string | default="ReadWriteOnce"
+      ingress:
+        enabled: boolean | default=false
+
+  resources:
+    # Database Resources
+    - id: postgresInitScript
+      includeWhen:
+        - ${schema.spec.database.enabled}
+      template:
+        apiVersion: v1
+        kind: ConfigMap
+        metadata:
+          name: ${schema.spec.name}-postgres-init
+        data:
+          init-db.sql: |
+            CREATE TABLE IF NOT EXISTS submissions (
+              id SERIAL PRIMARY KEY,
+              name TEXT NOT NULL,
+              email TEXT NOT NULL,
+              created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            );
+
+    - id: persistentVolumeClaim
+      includeWhen:
+        - ${schema.spec.database.enabled}
+        - ${schema.spec.database.storage.enabled}
+      template:
+        apiVersion: v1
+        kind: PersistentVolumeClaim
+        metadata:
+          name: ${schema.spec.database.name}-pvc
+        spec:
+          accessModes:
+            - ${schema.spec.database.storage.accessMode}
+          storageClassName: ${schema.spec.database.storage.storageClass}
+          resources:
+            requests:
+              storage: ${schema.spec.database.storage.size}
+
+    - id: postgresStatefulSet
+      includeWhen:
+        - ${schema.spec.database.enabled}
+      template:
+        apiVersion: apps/v1
+        kind: StatefulSet
+        metadata:
+          name: ${schema.spec.database.name}
+        spec:
+          selector:
+            matchLabels:
+              app: ${schema.spec.database.name}
+          serviceName: ${schema.spec.database.name}-svc
+          replicas: 1
+          template:
+            metadata:
+              labels:
+                app: ${schema.spec.database.name}
+            spec:
+              containers:
+                - name: ${schema.spec.database.name}
+                  image: ${schema.spec.database.image}
+                  env:
+                    - name: POSTGRESQL_DATABASE
+                      value: ${schema.spec.database.dbName}
+                    - name: POSTGRESQL_USERNAME
+                      value: ${schema.spec.database.username}
+                    - name: POSTGRESQL_PASSWORD
+                      value: ${schema.spec.database.password}
+                  ports:
+                    - containerPort: ${schema.spec.database.port}
+                  volumeMounts:
+                    - name: init-script-volume
+                      mountPath: /docker-entrypoint-initdb.d
+                    - name: postgres-data
+                      mountPath: /var/lib/postgresql/data
+              volumes:
+                - name: init-script-volume
+                  configMap:
+                    name: ${schema.spec.name}-postgres-init
+                - name: postgres-data
+                  persistentVolumeClaim:
+                    claimName: ${schema.spec.database.name}-pvc
+
+    - id: postgresService
+      includeWhen:
+        - ${schema.spec.database.enabled}
+      template:
+        apiVersion: v1
+        kind: Service
+        metadata:
+          name: ${schema.spec.database.name}-svc
+        spec:
+          selector:
+            app: ${schema.spec.database.name}
+          ports:
+            - port: ${schema.spec.database.port}
+              targetPort: ${schema.spec.database.port}
+
+    # Application Resources
+    - id: appDeployment
+      includeWhen:
+        - ${schema.spec.app.enabled}
+      template:
+        apiVersion: apps/v1
+        kind: Deployment
+        metadata:
+          name: ${schema.spec.app.name}
+        spec:
+          replicas: ${schema.spec.app.replicas}
+          selector:
+            matchLabels:
+              app: ${schema.spec.app.name}
+          template:
+            metadata:
+              labels:
+                app: ${schema.spec.app.name}
+            spec:
+              containers:
+                - name: ${schema.spec.app.name}
+                  image: ${schema.spec.app.image}
+                  imagePullPolicy: Always
+                  ports:
+                    - containerPort: ${schema.spec.app.port}
+                  env:
+                    - name: PGHOST
+                      value: ${schema.spec.database.name}-svc
+                    - name: PGUSER
+                      value: ${schema.spec.database.username}
+                    - name: PGPASSWORD
+                      value: ${schema.spec.database.password}
+                    - name: PGDATABASE
+                      value: ${schema.spec.database.dbName}
+                    - name: PGPORT
+                      value: "5432"
+                    - name: PORT
+                      value: "8086"
+
+    - id: appService
+      includeWhen:
+        - ${schema.spec.app.enabled}
+      template:
+        apiVersion: v1
+        kind: Service
+        metadata:
+          name: ${schema.spec.app.name}-svc
+        spec:
+          type: ${schema.spec.app.service.type}
+          selector:
+            app: ${schema.spec.app.name}
+          ports:
+            - port: ${schema.spec.app.port}
+              targetPort: ${schema.spec.app.port}
+
+    # Ingress Resource
+    - id: ingress
+      includeWhen:
+        - ${schema.spec.ingress.enabled}
+      template:
+        apiVersion: networking.k8s.io/v1
+        kind: Ingress
+        metadata:
+          name: ${schema.spec.name}-ingress
+        spec:
+          rules:
+            - http:
+                paths:
+                  - path: "/"
+                    pathType: Prefix
+                    backend:
+                      service:
+                        name: ${schema.spec.app.name}-svc
+                        port:
+                          number: ${schema.spec.app.port}
+
+

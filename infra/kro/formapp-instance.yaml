@@ -43,7 +43,7 @@ spec:
     enabled: true
     name: postgres
     image: bitnami/postgresql:12.1.0
-    replicas: 3
+    replicas: 1
     dbName: formdb
     username: postgres
     password: postgres

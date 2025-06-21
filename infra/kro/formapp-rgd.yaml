@@ -15,11 +15,30 @@ spec:
         enabled: boolean | default=true
         name: string
         image: string
-        replicas: integer | default=2
+        # replicas: integer | default=2
+       # HPA configuration for application
+        hpa:
+          enabled: boolean | default=true
+          minReplicas: integer | default=2
+          maxReplicas: integer | default=10
+          targetCPUUtilizationPercentage: integer | default=70
+          targetMemoryUtilizationPercentage: integer | default=80
+        # Resource requests and limits for HPA to work properly
+        resources:
+          requests:
+            cpu: string | default="100m"
+            memory: string | default="128Mi"
+          limits:
+            cpu: string | default="500m"
+            memory: string | default="512Mi"
+        # Service configuration
         service:
           type: string | default="LoadBalancer"
           port: integer | default=8086
           targetPort: integer | default=8086
+        # Ingress configuration
+        ingress:
+          enabled: boolean | default=false
       # The database configuration
       # This section defines the database deployment, service, and storage
       database:
@@ -30,6 +49,14 @@ spec:
         dbName: string | default="formdb"
         username: string | default="postgres"
         password: string | default="postgres"
+        # Resource requests and limits for HPA to work properly
+        resources:
+          requests:
+            cpu: string | default="250m"
+            memory: string | default="256Mi"
+          limits:
+            cpu: string | default="500m"
+            memory: string | default="1Gi"
         service:
           port: integer | default=5432
           targetPort: integer | default=5432
@@ -109,6 +136,14 @@ spec:
                   ports:
                     - containerPort: ${schema.spec.database.service.targetPort}
                       name: postgres
+                  resources:
+                    requests:
+                      cpu: ${schema.spec.database.resources.requests.cpu}
+                      memory: ${schema.spec.database.resources.requests.memory}
+                    limits:
+                      cpu: ${schema.spec.database.resources.limits.cpu}
+                      memory: ${schema.spec.database.resources.limits.memory}
+
                   volumeMounts:
                     - name: init-script-volume
                       mountPath: /docker-entrypoint-initdb.d
@@ -147,7 +182,7 @@ spec:
         metadata:
           name: ${schema.spec.app.name}
         spec:
-          replicas: ${schema.spec.app.replicas}
+          # replicas: ${schema.spec.app.replicas}
           selector:
             matchLabels:
               app: ${schema.spec.app.name}
@@ -156,6 +191,8 @@ spec:
               labels:
                 app: ${schema.spec.app.name}
             spec:
+              imagePullSecrets:
+                - name: regcred
               containers:
                 - name: ${schema.spec.app.name}
                   image: ${schema.spec.app.image}
@@ -163,6 +200,13 @@ spec:
                   ports:
                     - containerPort: ${schema.spec.app.service.targetPort}
                       name: app-port
+                  resources:
+                    requests:
+                      cpu: ${schema.spec.app.resources.requests.cpu}
+                      memory: ${schema.spec.app.resources.requests.memory}
+                    limits:
+                      cpu: ${schema.spec.app.resources.limits.cpu}
+                      memory: ${schema.spec.app.resources.limits.memory}
                   env:
                     - name: PGHOST
                       value: ${schema.spec.database.name}-svc
@@ -192,6 +236,55 @@ spec:
           ports:
             - port: ${schema.spec.app.service.port}
               targetPort: ${schema.spec.app.service.targetPort}
+
+    - id: appHPA
+      includeWhen:
+        - ${schema.spec.app.enabled}
+        - ${schema.spec.app.hpa.enabled}
+      template:
+        apiVersion: autoscaling/v2
+        kind: HorizontalPodAutoscaler
+        metadata:
+          name: ${schema.spec.app.name}-hpa
+        spec:
+          scaleTargetRef:
+            apiVersion: apps/v1
+            kind: Deployment
+            name: ${schema.spec.app.name}
+          minReplicas: ${schema.spec.app.hpa.minReplicas}
+          maxReplicas: ${schema.spec.app.hpa.maxReplicas}
+          metrics:
+            - type: Resource
+              resource:
+                name: cpu
+                target:
+                  type: Utilization
+                  averageUtilization: ${schema.spec.app.hpa.targetCPUUtilizationPercentage}
+            - type: Resource
+              resource:
+                name: memory
+                target:
+                  type: Utilization
+                  averageUtilization: ${schema.spec.app.hpa.targetMemoryUtilizationPercentage}
+          behavior:
+            # Scale up behavior
+            scaleUp:
+              stabilizationWindowSeconds: 60
+              policies:
+                - type: Percent
+                  value: 100
+                  periodSeconds: 60
+                - type: Pods
+                  value: 2
+                  periodSeconds: 60
+              selectPolicy: Max
+            # Scale down behavior
+            scaleDown:
+              stabilizationWindowSeconds: 300
+              policies:
+                - type: Percent
+                  value: 50
+                  periodSeconds: 60
 
     # Ingress Resource
     - id: ingress

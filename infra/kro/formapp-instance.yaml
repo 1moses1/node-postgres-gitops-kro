@@ -7,16 +7,38 @@ metadata:
 spec:
   name: formapp-stack
   # The application configuration
+  # This section defines the application settings including image, HPA, resources, and service details
+  # It also includes the database configuration for the application
   app:
     enabled: true
     name: form-app
     image: moses101/form-app:latest
-    replicas: 4
+    # HPA configuration
+    hpa:
+      enabled: true
+      minReplicas: 1
+      maxReplicas: 3
+      # Target CPU and memory utilization percentages for HPA
+      targetCPUUtilizationPercentage: 65
+      targetMemoryUtilizationPercentage: 70
+    # Resource requests and limits
+    resources:
+      requests:
+        cpu: "100m"
+        memory: "256Mi"
+      limits:
+        cpu: "300m"
+        memory: "1Gi"
+    # Service configuration
     service:
       type: LoadBalancer
       port: 8086
       targetPort: 8086
+    ingress:
+      enabled: false
   # The database configuration
+  # This section defines the database settings for the application
+  # It includes the database name, username, password, and service details
   database:
     enabled: true
     name: postgres
@@ -25,6 +47,15 @@ spec:
     dbName: formdb
     username: postgres
     password: postgres
+    # Resource requests and limits for the database
+    resources:
+      requests:
+        cpu: "500m"
+        memory: "512Mi"
+      limits:
+        cpu: "1"
+        memory: "2Gi"
+    # Service configuration for the database  
     service:
       port: 5432
       targetPort: 5432
@@ -34,7 +65,5 @@ spec:
       storageClass: longhorn
       size: 3Gi
       accessMode: ReadWriteOnce
-  ingress:
-    enabled: false
 
 

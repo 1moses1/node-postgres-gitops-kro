@@ -16,7 +16,7 @@ spec:
     # HPA configuration
     hpa:
       enabled: true
-      minReplicas: 2
+      minReplicas: 1
       maxReplicas: 4
       # Target CPU and memory utilization percentages for HPA
       targetCPUUtilizationPercentage: 65

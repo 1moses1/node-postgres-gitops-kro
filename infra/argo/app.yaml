@@ -8,7 +8,7 @@ spec:
   source:
     repoURL: https://github.com/1moses1/node-postgres-gitops-kro.git
     targetRevision: HEAD
-    path: infra/kro
+    path: infra/kro/instance
   destination:
     server: https://kubernetes.default.svc
     namespace: kro-apps

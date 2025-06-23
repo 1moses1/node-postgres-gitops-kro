@@ -289,7 +289,9 @@ spec:
     # Ingress Resource
     - id: ingress
       includeWhen:
-        - ${schema.spec.ingress.enabled}
+        - ${schema.spec.app.enabled}
+        - ${schema.spec.app.ingress.enabled}
+        # - ${schema.spec.ingress.enabled}
       template:
         apiVersion: networking.k8s.io/v1
         kind: Ingress

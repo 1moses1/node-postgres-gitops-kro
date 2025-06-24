@@ -1,0 +1,9 @@
+# kro-formapp-access-role.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: formapp-writer
+rules:
+  - apiGroups: ["kro.run"]
+    resources: ["formapps"]
+    verbs: ["create", "get", "list", "watch"]
